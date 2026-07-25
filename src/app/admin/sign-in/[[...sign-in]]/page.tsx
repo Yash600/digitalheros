@@ -11,7 +11,7 @@ export default function AdminSignInPage() {
   return (
     <main className="flex min-h-screen flex-col items-center justify-center gap-4 bg-cream px-6">
       <p className="text-xs font-semibold uppercase tracking-widest text-forest">Admin access</p>
-      <SignIn path="/admin/sign-in" routing="path" signUpUrl="/admin/sign-up" fallbackRedirectUrl="/dashboard" />
+      <SignIn path="/admin/sign-in" routing="path" signUpUrl="/admin/sign-up" forceRedirectUrl="/dashboard" />
     </main>
   );
 }

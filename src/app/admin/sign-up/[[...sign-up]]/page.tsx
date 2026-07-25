@@ -8,7 +8,7 @@ export default function AdminSignUpPage() {
   return (
     <main className="flex min-h-screen flex-col items-center justify-center gap-4 bg-cream px-6">
       <p className="text-xs font-semibold uppercase tracking-widest text-forest">Admin sign up</p>
-      <SignUp path="/admin/sign-up" routing="path" signInUrl="/admin/sign-in" fallbackRedirectUrl="/admin/claim" />
+      <SignUp path="/admin/sign-up" routing="path" signInUrl="/admin/sign-in" forceRedirectUrl="/admin/claim" />
     </main>
   );
 }
