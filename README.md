@@ -67,13 +67,71 @@ a claim about production-grade access control — in a real deployment, admin
 promotion would go through an existing Admin's "Team" page instead of a
 shared code.
 
-## Roles and permission model
+## End-to-end flow
+
+There are three participants, and a lead only ever moves forward through
+them in one direction:
+
+1. **The public visitor** submits the capture form on the homepage. No
+   account, no login. This creates a `Lead` row with status `NEW` and
+   `assignedToId = null` — it exists in the system, but isn't in anyone's
+   queue yet.
+2. **The lead appears only in the Admin's dashboard first.** Because a
+   brand-new lead is unassigned, and Members only ever see leads assigned to
+   *them*, nobody except an Admin can see it at this point. This is
+   deliberate: an Admin is the triage point before anything reaches a rep.
+3. **An Admin opens the lead and assigns it** to a specific Member from the
+   lead detail page. This write also logs an `ASSIGNED` activity entry.
+4. **The lead now appears in that Member's dashboard** (and stays visible to
+   every Admin too — Admin visibility is never restricted). The Member works
+   it: adds timestamped notes, and advances its status forward
+   (`NEW → CONTACTED → QUALIFIED → WON/LOST`, with `LOST` re-openable to
+   `NEW`). Every note and status change writes its own activity entry.
+5. **An Admin can reassign at any point** (e.g. handing it to someone else),
+   which is logged the same way, and can see the full activity trail and
+   notes on every lead in the system regardless of who's working it.
+
+Nothing in this flow is client-side trust: every step above is re-checked
+server-side on every request (`src/lib/leadService.ts`, `src/lib/auth.ts`),
+using the query itself to scope what a Member can even see — not a filter
+applied after the fact, and not something a client-side UI decision could
+bypass.
+
+## What each role can actually do
+
+**Admin can:**
+- See every lead in the system, assigned or not, from the moment it's submitted.
+- Assign or reassign any lead to any Member (the only role that can do this).
+- Change status, add notes, and view the full activity trail on any lead.
+- View the **Team** page — every user's name, email, and role.
+- Do everything a Member can do, on any lead, not just their own.
+
+**Admin cannot:**
+- Bypass the status-transition graph (e.g. jump `NEW` straight to `WON`) — this
+  is rejected server-side regardless of role, since it's a workflow-integrity
+  rule, not a permission.
+
+**Member can:**
+- See only leads specifically assigned to them — nothing else exists from
+  their point of view, including in the API (`GET /api/leads` scopes the
+  underlying query itself for a Member, it doesn't return everything and hide
+  rows in the UI).
+- Add notes and advance the status of a lead assigned to them.
+
+**Member cannot:**
+- See, open, or act on a lead assigned to someone else, or one that's still
+  unassigned (`403 Forbidden` if attempted directly via the API).
+- Assign or reassign any lead, including to themselves (`403 Forbidden`).
+- View the Team page or any other user's information.
+
+## Roles and permission model (quick reference)
 
 | Action                        | Admin | Member |
 |--------------------------------|:-----:|:------:|
+| See a brand-new, unassigned lead | ✅  | ❌     |
 | View all leads                 | ✅    | ❌ (own only) |
 | View own assigned leads        | ✅    | ✅     |
-| Reassign a lead                | ✅    | ❌     |
+| Assign / reassign a lead        | ✅    | ❌     |
 | Change status on own lead      | ✅    | ✅     |
 | Add notes on own lead          | ✅    | ✅     |
 | View team / manage roles       | ✅    | ❌     |
