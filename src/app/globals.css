@@ -1,0 +1,80 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: #F2EFE6;
+  color: #15170F;
+}
+
+.display-headline {
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 0.95;
+  text-transform: uppercase;
+}
+
+.accent-italic {
+  font-family: Georgia, ui-serif, serif;
+  font-style: italic;
+  font-weight: 400;
+  text-transform: none;
+}
+
+.card-surface {
+  background-color: #FBFAF5;
+  border: 1px solid rgba(21, 23, 15, 0.08);
+  box-shadow: 0 1px 2px rgba(21, 23, 15, 0.04);
+}
+
+.pill-nav-item {
+  border-radius: 999px;
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  transition: background-color 0.15s ease;
+}
+
+.pill-nav-item[data-active="true"] {
+  background-color: #FBFAF5;
+  border: 1px solid rgba(21, 23, 15, 0.08);
+}
+
+.btn-primary {
+  background-color: #1F3D2B;
+  color: #F2EFE6;
+  border-radius: 999px;
+  padding: 0.75rem 1.5rem;
+  font-weight: 600;
+  transition: background-color 0.15s ease;
+}
+
+.btn-primary:hover {
+  background-color: #2E5A3E;
+}
+
+.btn-secondary {
+  background-color: transparent;
+  border: 1px solid rgba(21, 23, 15, 0.15);
+  color: #15170F;
+  border-radius: 999px;
+  padding: 0.75rem 1.5rem;
+  font-weight: 600;
+}
+
+.field-input {
+  width: 100%;
+  background-color: #F2EFE6;
+  border: 1px solid rgba(21, 23, 15, 0.12);
+  border-radius: 0.6rem;
+  padding: 0.85rem 1rem;
+  font-size: 0.95rem;
+  outline: none;
+}
+
+.field-input:focus {
+  border-color: #1F3D2B;
+}

@@ -1,0 +1,91 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  // Pooled connection (via Neon's "-pooler" endpoint) - used by the running
+  // app. This is what wakes a suspended Neon compute transparently.
+  url       = env("DATABASE_URL")
+  // Direct (non-pooled) connection - used only by `prisma migrate` under the
+  // hood. Migration tooling wants a single unpooled session; the app doesn't.
+  directUrl = env("DIRECT_URL")
+}
+
+enum Role {
+  ADMIN
+  MEMBER
+}
+
+enum LeadStatus {
+  NEW
+  CONTACTED
+  QUALIFIED
+  WON
+  LOST
+}
+
+enum ActivityType {
+  CREATED
+  ASSIGNED
+  STATUS_CHANGED
+  NOTE_ADDED
+}
+
+model User {
+  id        String   @id @default(cuid())
+  clerkId   String   @unique
+  email     String   @unique
+  name      String?
+  role      Role     @default(MEMBER)
+  createdAt DateTime @default(now())
+
+  assignedLeads Lead[]         @relation("AssignedLeads")
+  notes         LeadNote[]
+  activities    LeadActivity[]
+}
+
+model Lead {
+  id             String     @id @default(cuid())
+  name           String
+  email          String
+  phone          String?
+  projectDetails String?
+  source         String     @default("web_form")
+  status         LeadStatus @default(NEW)
+  assignedToId   String?
+  assignedTo     User?      @relation("AssignedLeads", fields: [assignedToId], references: [id])
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt
+
+  notes      LeadNote[]
+  activities LeadActivity[]
+
+  @@index([status])
+  @@index([assignedToId])
+}
+
+model LeadNote {
+  id        String   @id @default(cuid())
+  leadId    String
+  lead      Lead     @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  authorId  String
+  author    User     @relation(fields: [authorId], references: [id])
+  body      String
+  createdAt DateTime @default(now())
+
+  @@index([leadId])
+}
+
+model LeadActivity {
+  id        String       @id @default(cuid())
+  leadId    String
+  lead      Lead         @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  actorId   String?
+  actor     User?        @relation(fields: [actorId], references: [id])
+  type      ActivityType
+  metadata  Json?
+  createdAt DateTime     @default(now())
+
+  @@index([leadId])
+}
