@@ -2,8 +2,12 @@ import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
-// Seeds two demo accounts. Replace clerkId with real Clerk user IDs after
-// creating the two accounts in your Clerk dashboard (see README "Local setup").
+// NOTE: not required for normal use. Account provisioning is now fully
+// self-serve (see getCurrentUser in src/lib/auth.ts and the /admin/claim
+// invite-code flow) - this script is only useful if you want to pre-populate
+// placeholder rows/leads for local testing without going through sign-up.
+// Replace clerkId with a real Clerk user ID if you want a seeded row to
+// actually be usable by a real signed-in session.
 async function main() {
   const admin = await prisma.user.upsert({
     where: { email: "admin@leadflow.demo" },

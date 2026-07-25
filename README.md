@@ -8,7 +8,7 @@ authenticated pipeline where an **Admin** assigns it to a **Member**, who works
 the lead through a status pipeline, adds notes, and has every action logged to
 an audit trail.
 
-Live demo: **[ADD YOUR DEPLOYED URL HERE]**
+Live demo: **[digitalheros-silk.vercel.app](https://digitalheros-silk.vercel.app/)**
 
 ## Stack
 
@@ -181,12 +181,18 @@ Postgres service container → lint → test → build. See `.github/workflows/c
 4. Point the Clerk webhook at the production URL.
 5. Update the "Live demo" link at the top of this README.
 
-## Demo credentials
+## Demo access
 
-- Admin: `admin@leadflow.demo` / [set a password in Clerk when creating the test user]
-- Member: `member@leadflow.demo` / [same]
+There are no fixed demo credentials to hand over - sign-up is fully self-serve
+and works the same way for anyone testing this:
 
-*(Fill in the actual working credentials here before submitting.)*
+- **Member**: go to **Member Sign In → Sign up**, create any account. You'll
+  land in the dashboard as a `MEMBER` immediately (auto-provisioned).
+- **Admin**: go to **Admin Sign In → Sign up**, create any account, then enter
+  the invite code shown on the resulting `/admin/claim` page. You'll be
+  promoted to `ADMIN` and land in the dashboard with visibility into every
+  lead. See "Becoming an Admin" above for why this is gated by a code instead
+  of open self-promotion.
 
 ## Where AI was used
 
