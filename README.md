@@ -55,7 +55,13 @@ also means the app works correctly even without the Clerk webhook configured,
 which needs a public HTTPS URL Clerk can reach and so can't fire on
 `localhost`). To become an **Admin**, sign up via **Admin Sign In → Sign up**
 on the homepage, which redirects to `/admin/claim` — enter the invite code
-below:
+below. Note: this auto-redirect only fires for a genuinely new sign-up; if
+you use "Continue with Google" with an account that's already registered
+(e.g. from testing earlier), Clerk treats that as a sign-in rather than a
+sign-up and takes you straight to `/dashboard` instead. If that happens,
+there's also a **"Claim Admin access"** link directly in the dashboard header
+(shown to any signed-in Member) that goes to `/admin/claim` regardless of how
+you got there:
 
 ```
 leadflow-admin-2026

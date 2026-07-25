@@ -21,6 +21,11 @@ export default async function DashboardLayout({ children }: { children: React.Re
             </nav>
           </div>
           <div className="flex items-center gap-4">
+            {user?.role === "MEMBER" && (
+              <Link href="/admin/claim" className="text-xs text-ink/50 underline decoration-line hover:text-forest">
+                Claim Admin access
+              </Link>
+            )}
             {user && (
               <span className="rounded-pill border border-line bg-cream px-3 py-1 text-xs font-semibold uppercase tracking-wide text-forest">
                 {user.role}
