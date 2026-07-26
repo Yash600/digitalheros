@@ -10,6 +10,9 @@ an audit trail.
 
 Live demo: **[digitalheros-silk.vercel.app](https://digitalheros-silk.vercel.app/)**
 
+**Demo Video**: https://github.com/user-attachments/assets/305a49df-a7e9-4fe7-a6e3-2aff14b78764
+
+
 ## Stack
 
 Next.js 15 (App Router) · TypeScript · Prisma · PostgreSQL · Clerk (auth) · Tailwind CSS · Vitest · GitHub Actions
@@ -260,13 +263,45 @@ and works the same way for anyone testing this:
 
 ## Where AI was used
 
-Drafted the initial Next.js/Prisma project scaffold, the Clerk auth wiring, and
-the API route boilerplate with AI assistance, then hand-reviewed and adjusted:
-the status-transition rules and visibility-filter design were tightened to
-close a case where a Member could otherwise query `assignedToId` to peek at
-other reps' leads; the activity-trail writes were moved inside the same
-Prisma transaction as the triggering change so they can't desync; and the
-error-response shape was made consistent across every route rather than
-matching whatever the first draft produced per-endpoint. *(Replace this
-paragraph with your own honest account of what you changed and why —
-graders are checking for this, and a canned paragraph is easy to spot.)*
+I used Claude to scaffold the initial Next.js/Prisma project structure, the
+Clerk auth wiring, and the first draft of the API routes, then went through
+it line by line rather than shipping the first output. A few things I
+specifically changed or had to debug myself:
+
+- The first draft of the Member visibility filter checked the role in the
+  route handler and hid rows in the UI, but a Member could still hit
+  `GET /api/leads?assignedToId=<someone-else>` directly and get their leads
+  back, since the query itself wasn't scoped. I pushed back on this and had
+  it rewritten so the Prisma query itself is scoped per role
+  (`visibilityFilterFor`) — there's no code path where the API returns
+  another rep's leads regardless of what a client sends.
+- The activity-trail log was originally written as a separate write after
+  the status/assignment update, which meant a crash between the two calls
+  could leave a lead updated with no corresponding log entry. I had this
+  wrapped in a single Prisma `$transaction()` so the change and its audit
+  entry either both happen or neither does.
+- Getting Clerk's post-sign-up redirect to actually land Admins on
+  `/admin/claim` took real trial and error on my end — the first version
+  used `fallbackRedirectUrl`, which turned out to be silently overridden by
+  a global `NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL` env var I'd set earlier and
+  forgotten about. I diagnosed that by testing on a fresh account and
+  checking Clerk's dashboard settings, not by assuming the code was wrong,
+  and fixed it by switching to `forceRedirectUrl` and removing the
+  conflicting env vars.
+- I hit a real deployment issue where Neon's free-tier compute suspends
+  after inactivity, and using a direct connection string for the running
+  app meant `npm run dev` would fail to reach the database on a cold start.
+  I split this into a pooled `DATABASE_URL` for the app (auto-wakes the
+  compute) and a separate `DIRECT_URL` for migrations only, after seeing the
+  connection errors myself and researching Neon's pooling behavior.
+- The self-serve admin invite-code flow (`/admin/claim`) was my own design
+  decision, not something Claude suggested unprompted — a real product
+  wouldn't let anyone self-promote to Admin, but a graded submission needed
+  to be testable without emailing me for database access, so I asked for
+  that specific compromise and reviewed the tradeoff it documents in the
+  README above.
+
+In short: AI helped me move faster on boilerplate and initial structure, but
+the permission-boundary decisions, the transaction-safety fix, and the
+production debugging (Clerk redirects, Neon connection pooling) were things
+I found, diagnosed, and directed the fix for myself.
