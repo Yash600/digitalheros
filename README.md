@@ -10,6 +10,10 @@ an audit trail.
 
 Live demo: **[digitalheros-silk.vercel.app](https://digitalheros-silk.vercel.app/)**
 
+
+**Demo Video**: https://github.com/user-attachments/assets/305a49df-a7e9-4fe7-a6e3-2aff14b78764
+
+
 ## Stack
 
 Next.js 15 (App Router) · TypeScript · Prisma · PostgreSQL · Clerk (auth) · Tailwind CSS · Vitest · GitHub Actions
